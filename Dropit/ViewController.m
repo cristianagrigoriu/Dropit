@@ -9,18 +9,20 @@
 
 #import "ViewController.h"
 #import "DropitBehaviour.h"
+#import "BezierPathView.h"
 
 @interface ViewController () <UIDynamicAnimatorDelegate>
-@property (weak, nonatomic) IBOutlet UIView *GameView;
+@property (weak, nonatomic) IBOutlet BezierPathView *GameView;
 @property (strong, nonatomic) UIDynamicAnimator *animator;
 @property (strong, nonatomic) DropitBehaviour *dropitBehaviour;
-
+@property (strong, nonatomic) UIAttachmentBehavior *attachment;
+@property (strong, nonatomic) UIView *droppingView;
 
 @end
 
 @implementation ViewController
 
-static const CGSize DROP_SIZE = {48, 48};
+static const CGSize DROP_SIZE = {42, 42};
 
 - (UIDynamicAnimator *) animator
 {
@@ -96,6 +98,37 @@ static const CGSize DROP_SIZE = {48, 48};
     [self drop];
 }
 
+- (IBAction)pan:(UIPanGestureRecognizer *)sender {
+    //where did the pan happen
+    CGPoint gesturePoint = [sender locationInView:self.GameView];
+    if (sender.state ==UIGestureRecognizerStateBegan) { //could use snippet for all if clauses
+        [self attachDroppingViewToPoint:gesturePoint];
+        
+    } else if (sender.state == UIGestureRecognizerStateChanged) { //attach between an item and an anchor point (that follows my finger)
+        self.attachment.anchorPoint = gesturePoint;
+    } else if (sender.state == UIGestureRecognizerStateEnded) {
+        [self.animator removeBehavior:self.attachment];
+        //self.GameView.path = nil; //aici!!!!!!!!!!!!!!!
+    }
+}
+
+- (void) attachDroppingViewToPoint:(CGPoint)anchorPoint
+{
+    if (self.droppingView) {
+        self.attachment = [[UIAttachmentBehavior alloc] initWithItem:self.droppingView attachedToAnchor:anchorPoint];
+        UIView *droppingView = self.droppingView; //because the action block gets executed every time and it sets self.droppingView to nil, so we need a local variable to store it
+//        __weak ViewController *weakSelf = self; //we use this because otherwise we would have a strong pointer to ourselves in the block, because it also contains a strong pointer to self (in self.attachment.anchorPoint, for example), which is now replaced with a weak pointer (weakSelf)
+//        self.attachment.action = ^{
+//            UIBezierPath *path = [[UIBezierPath alloc] init];
+//            [path moveToPoint:weakSelf.attachment.anchorPoint];//the anchor point's current attachment point
+//            [path addLineToPoint:droppingView.center];
+//            weakSelf.GameView.path = path;
+//        };
+        self.droppingView = nil; //can't grab that thing and drop it and grab it again
+        [self.animator addBehavior:self.attachment];
+    }
+}
+
 - (void)drop
 {
     CGRect frame;
@@ -108,8 +141,7 @@ static const CGSize DROP_SIZE = {48, 48};
     dropView.backgroundColor = [self randomColor];
     [self.GameView addSubview:dropView];
     
-//    [self.gravity addItem:dropView];
-//    [self.collider addItem:dropView]; //by default, if you click the button fast, they start falling not on top of each other, but they also tilt to the sides
+    self.droppingView = dropView;
     
     [self.dropitBehaviour addItem:dropView];
 }
