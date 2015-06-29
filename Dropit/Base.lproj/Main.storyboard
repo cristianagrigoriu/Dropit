@@ -20,17 +20,17 @@
                                 <rect key="frame" x="0.0" y="-8" width="375" height="667"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <gestureRecognizers/>
-                                <connections>
-                                    <outletCollection property="gestureRecognizers" destination="FSw-26-baU" appends="YES" id="Xd9-Yj-prh"/>
-                                    <outletCollection property="gestureRecognizers" destination="nqa-7V-hoh" appends="YES" id="c6j-X2-eFh"/>
-                                </connections>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="FSw-26-baU" appends="YES" id="mZO-ZM-5HK"/>
+                            <outletCollection property="gestureRecognizers" destination="nqa-7V-hoh" appends="YES" id="AOU-Wb-vJS"/>
+                        </connections>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
                     <connections>
-                        <outlet property="GameView" destination="6dw-Df-hAO" id="ZM0-bg-4v3"/>
+                        <outlet property="GameView" destination="8bC-Xf-vdC" id="fiV-k8-u1B"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

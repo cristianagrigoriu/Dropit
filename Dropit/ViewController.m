@@ -48,7 +48,7 @@ static const CGSize DROP_SIZE = {42, 42};
         NSMutableArray *dropsFound = [[NSMutableArray alloc] init];
         for (CGFloat x = DROP_SIZE.width/2; x <= self.GameView.bounds.size.width-DROP_SIZE.width/2; x += DROP_SIZE.width) {
             UIView *hitView = [self.GameView hitTest:CGPointMake(x, y) withEvent:NULL];
-            if ([hitView superview] ==self.GameView) {
+            if ([hitView superview] == self.GameView) {
                 [dropsFound addObject:hitView];
             }
             else {
@@ -101,14 +101,14 @@ static const CGSize DROP_SIZE = {42, 42};
 - (IBAction)pan:(UIPanGestureRecognizer *)sender {
     //where did the pan happen
     CGPoint gesturePoint = [sender locationInView:self.GameView];
-    if (sender.state ==UIGestureRecognizerStateBegan) { //could use snippet for all if clauses
+    if (sender.state == UIGestureRecognizerStateBegan) { //could use snippet for all if clauses
         [self attachDroppingViewToPoint:gesturePoint];
         
     } else if (sender.state == UIGestureRecognizerStateChanged) { //attach between an item and an anchor point (that follows my finger)
         self.attachment.anchorPoint = gesturePoint;
     } else if (sender.state == UIGestureRecognizerStateEnded) {
         [self.animator removeBehavior:self.attachment];
-        //self.GameView.path = nil; //aici!!!!!!!!!!!!!!!
+        self.GameView.path = nil;
     }
 }
 
@@ -117,14 +117,14 @@ static const CGSize DROP_SIZE = {42, 42};
     if (self.droppingView) {
         self.attachment = [[UIAttachmentBehavior alloc] initWithItem:self.droppingView attachedToAnchor:anchorPoint];
         UIView *droppingView = self.droppingView; //because the action block gets executed every time and it sets self.droppingView to nil, so we need a local variable to store it
-//        __weak ViewController *weakSelf = self; //we use this because otherwise we would have a strong pointer to ourselves in the block, because it also contains a strong pointer to self (in self.attachment.anchorPoint, for example), which is now replaced with a weak pointer (weakSelf)
-//        self.attachment.action = ^{
-//            UIBezierPath *path = [[UIBezierPath alloc] init];
-//            [path moveToPoint:weakSelf.attachment.anchorPoint];//the anchor point's current attachment point
-//            [path addLineToPoint:droppingView.center];
-//            weakSelf.GameView.path = path;
-//        };
-        self.droppingView = nil; //can't grab that thing and drop it and grab it again
+        __weak ViewController *weakSelf = self; //we use this because otherwise we would have a strong pointer to ourselves in the block, because it also contains a strong pointer to self (in self.attachment.anchorPoint, for example), which is now replaced with a weak pointer (weakSelf)
+        self.attachment.action = ^{
+            UIBezierPath *path = [[UIBezierPath alloc] init];
+            [path moveToPoint:weakSelf.attachment.anchorPoint];//the anchor point's current attachment point
+            [path addLineToPoint:droppingView.center];
+            weakSelf.GameView.path = path;
+        };
+        //self.droppingView = nil; //done in order not to be able to grab that thing and drop it and grab it again
         [self.animator addBehavior:self.attachment];
     }
 }
